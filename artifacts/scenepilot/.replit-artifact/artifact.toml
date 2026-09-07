@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "ScenePilot"
+description = "A cinematic production planning assistant that turns scene descriptions and production constraints into practical shooting plans for filmmakers."
+version = "1.0.0"
+id = "artifacts/scenepilot"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20941
+
+[services.development]
+run = "pnpm --filter @workspace/scenepilot run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/scenepilot", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/scenepilot/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20941"
+BASE_PATH = "/"
