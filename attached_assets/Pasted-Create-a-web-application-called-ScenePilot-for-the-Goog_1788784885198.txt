@@ -1,0 +1,73 @@
+Create a web application called “ScenePilot” for the Google Cloud Agentic Cinema Hackathon.
+
+Purpose:
+ScenePilot helps filmmakers convert a scene description and production constraints into a practical shooting plan.
+
+Required technology:
+- Python 3.11
+- Flask backend
+- Vanilla HTML, CSS, and JavaScript frontend
+- Google Agent Development Kit (google-adk)
+- Google Gemini through Google Cloud Agent Platform Express Mode
+- Read GOOGLE_API_KEY and GOOGLE_GENAI_USE_ENTERPRISE from environment variables
+- Do not use OpenAI, Anthropic, or any other AI model or AI API
+- Do not use a database, authentication, React, or external media-generation services
+- Prepare the app for public Replit deployment
+
+User inputs:
+- Scene description
+- Budget in dollars
+- Crew size
+- Available shooting hours
+- Available equipment as a comma-separated list
+- Location type: indoor, outdoor, or mixed
+
+Agent workflow:
+1. Analyse the scene requirements.
+2. Generate a structured draft shot list.
+3. Validate the plan against the user’s time, budget, crew, and equipment constraints using deterministic Python validation functions.
+4. If constraints are violated, ask Gemini to revise the plan once.
+5. Return the final practical production plan.
+
+Create Python tool functions for:
+- Calculating the total shooting time
+- Checking equipment availability
+- Checking crew, time, and budget constraints
+- Producing a list of constraint warnings
+
+The result must contain:
+- Scene summary
+- Scene breakdown: cast, props, location, lighting, and production risks
+- Shot list: shot number, shot type, description, equipment, crew required, estimated minutes, and estimated cost
+- Shooting schedule
+- Total estimated time
+- Total estimated cost
+- Constraint status
+- Warnings
+- Adaptations made by the agent
+
+Interface requirements:
+- Cinematic but professional visual design
+- Clear input form
+- “Generate Production Plan” button
+- Loading indicator
+- Visible workflow stages: Analysing Scene, Creating Shot Plan, Checking Constraints, Revising Plan
+- Results displayed in readable cards and tables
+- Responsive desktop and mobile layout
+- Include a sample scene button
+- Include friendly validation and API error messages
+- Do not reveal private model reasoning or chain-of-thought
+
+Project files:
+- app.py
+- agent.py
+- tools.py
+- templates/index.html
+- static/style.css
+- static/app.js
+- requirements.txt
+- README.md
+- .gitignore
+- LICENSE using the MIT License
+
+Create a POST /api/plan endpoint. Keep the code modular and readable. First show me your implementation plan and file structure. Do not begin implementation until I approve the plan.
