@@ -35,13 +35,23 @@ def build_deterministic_draft(inputs: dict[str, Any]) -> dict[str, Any]:
     location_type = inputs["location_type"]
     equipment = _normalise_equipment(inputs["equipment"])
     equipment_lower = {item.lower() for item in equipment}
-    camera = next((item for item in equipment if "camera" in item.lower()), "camera package")
+    camera = next(
+        (item for item in equipment if "camera" in item.lower()), "camera package"
+    )
     audio = next(
-        (item for item in equipment if any(token in item.lower() for token in ("mic", "audio", "recorder"))),
+        (
+            item
+            for item in equipment
+            if any(token in item.lower() for token in ("mic", "audio", "recorder"))
+        ),
         "sound kit",
     )
     light = next(
-        (item for item in equipment if any(token in item.lower() for token in ("light", "led", "lantern"))),
+        (
+            item
+            for item in equipment
+            if any(token in item.lower() for token in ("light", "led", "lantern"))
+        ),
         "available light",
     )
 
@@ -49,7 +59,11 @@ def build_deterministic_draft(inputs: dict[str, Any]) -> dict[str, Any]:
     has_stabiliser = any(
         token in equipment_lower for token in ("tripod", "gimbal", "slider", "dolly")
     )
-    movement_shot = "Gimbal or tripod movement" if has_stabiliser else "Locked-off movement alternative"
+    movement_shot = (
+        "Gimbal or tripod movement"
+        if has_stabiliser
+        else "Locked-off movement alternative"
+    )
     shots = [
         {
             "shot_number": 1,
@@ -138,7 +152,11 @@ def _extract_json(text: str) -> dict[str, Any]:
     return json.loads(cleaned[start : end + 1])
 
 
-def _gemini_prompt(inputs: dict[str, Any], draft: dict[str, Any], warnings: list[dict[str, Any]] | None = None) -> str:
+def _gemini_prompt(
+    inputs: dict[str, Any],
+    draft: dict[str, Any],
+    warnings: list[dict[str, Any]] | None = None,
+) -> str:
     constraint_context = ""
     if warnings:
         constraint_context = (
@@ -149,6 +167,8 @@ def _gemini_prompt(inputs: dict[str, Any], draft: dict[str, Any], warnings: list
 You are the ScenePilot production planning agent. Return only a JSON object, never commentary.
 Do not reveal hidden reasoning. Create a practical production plan from the input below.
 Respect the requested budget, crew size, shooting hours, equipment, and location type.
+Use only equipment names exactly as listed in INPUT. Never invent brands, models, lenses, accessories, or substitute equipment.
+Use only equipment names exactly as listed in INPUT. Never invent brands, models, lenses, accessories, or substitute equipment.
 Keep the exact response shape:
 {{
   "scene_summary": "string",
@@ -214,9 +234,14 @@ async def _run_adk(prompt: str) -> dict[str, Any]:
 def _normalise_plan(plan: dict[str, Any], fallback: dict[str, Any]) -> dict[str, Any]:
     """Keep model output safe for the UI while retaining fallback coverage."""
     merged = {**fallback, **plan}
-    merged["scene_breakdown"] = {**fallback["scene_breakdown"], **plan.get("scene_breakdown", {})}
+    merged["scene_breakdown"] = {
+        **fallback["scene_breakdown"],
+        **plan.get("scene_breakdown", {}),
+    }
     merged["shot_list"] = plan.get("shot_list") or fallback["shot_list"]
-    merged["adaptations_made"] = plan.get("adaptations_made") or fallback["adaptations_made"]
+    merged["adaptations_made"] = (
+        plan.get("adaptations_made") or fallback["adaptations_made"]
+    )
     for shot_index, shot in enumerate(merged["shot_list"], start=1):
         shot.setdefault("shot_number", shot_index)
         shot.setdefault("shot_type", "Coverage shot")
@@ -228,21 +253,126 @@ def _normalise_plan(plan: dict[str, Any], fallback: dict[str, Any]) -> dict[str,
     return merged
 
 
+def _apply_cost_model(
+    plan: dict[str, Any],
+    location_type: str,
+    hourly_rate: float = 50.0,
+) -> dict[str, Any]:
+    """Calculate a transparent estimate for the complete production."""
+    shots = plan.get("shot_list", [])
+    if not shots:
+        return plan
+
+    labour_costs = []
+    total_minutes = 0
+
+    for shot in shots:
+        minutes = max(0, int(shot.get("estimated_minutes", 0)))
+        crew = max(1, int(shot.get("crew_required", 1)))
+        labour_costs.append(round((minutes / 60) * crew * hourly_rate, 2))
+        total_minutes += minutes
+
+    max_crew = max(max(1, int(shot.get("crew_required", 1))) for shot in shots)
+
+    location_cost = {
+        "indoor": 250.0,
+        "outdoor": 350.0,
+        "mixed": 500.0,
+    }.get(location_type, 300.0)
+
+    transport_cost = 75.0 + (15.0 * max_crew)
+    meals_cost = 25.0 * max_crew
+    props_cost = 100.0
+
+    labour_total = round(sum(labour_costs), 2)
+    subtotal = round(
+        labour_total + location_cost + transport_cost + meals_cost + props_cost,
+        2,
+    )
+    contingency = round(subtotal * 0.10, 2)
+    production_total = round(subtotal + contingency, 2)
+
+    overhead = production_total - labour_total
+    allocated_cost = 0.0
+
+    for index, (shot, labour) in enumerate(zip(shots, labour_costs)):
+        minutes = max(0, int(shot.get("estimated_minutes", 0)))
+        weight = minutes / total_minutes if total_minutes else 1 / len(shots)
+
+        if index == len(shots) - 1:
+            shot_cost = round(production_total - allocated_cost, 2)
+        else:
+            shot_cost = round(labour + overhead * weight, 2)
+            allocated_cost += shot_cost
+
+        shot["estimated_cost"] = shot_cost
+
+    plan["cost_breakdown"] = {
+        "labour": labour_total,
+        "location_and_permits": location_cost,
+        "transport": transport_cost,
+        "meals": meals_cost,
+        "props_and_consumables": props_cost,
+        "contingency": contingency,
+        "total": production_total,
+    }
+
+    return plan
+
+
+async def _run_adk_with_retry(
+    prompt: str,
+    max_attempts: int = 2,
+) -> dict[str, Any]:
+    """Retry Gemini once after a temporary API failure."""
+    for attempt in range(max_attempts):
+        try:
+            return await _run_adk(prompt)
+        except Exception as exc:
+            message = str(exc).lower()
+            temporary_error = any(
+                token in message
+                for token in (
+                    "429",
+                    "resource_exhausted",
+                    "503",
+                    "temporarily unavailable",
+                )
+            )
+
+            if not temporary_error or attempt == max_attempts - 1:
+                raise
+
+            await asyncio.sleep(3)
+
+    raise RuntimeError("Gemini retry failed.")
+
+
 def create_production_plan(inputs: dict[str, Any]) -> dict[str, Any]:
     """Execute the requested analyse -> draft -> validate -> revise workflow."""
     draft = build_deterministic_draft(inputs)
     adaptations = list(draft["adaptations_made"])
+    generation_source = "fallback"
     google_key_available = bool(os.getenv("GOOGLE_API_KEY"))
 
     if google_key_available:
         try:
-            model_draft = asyncio.run(_run_adk(_gemini_prompt(inputs, draft)))
+            model_draft = asyncio.run(
+                _run_adk_with_retry(_gemini_prompt(inputs, draft))
+            )
             draft = _normalise_plan(model_draft, draft)
+            adaptations = list(draft.get("adaptations_made", adaptations))
+            generation_source = "gemini"
         except Exception:
-            adaptations.append("The first-pass agent response was unavailable, so the deterministic production draft was retained.")
+            adaptations.append(
+                "The first-pass agent response was unavailable, so the deterministic production draft was retained."
+            )
     else:
-        adaptations.append("No Google API key was available, so a deterministic draft was used.")
+        adaptations.append(
+            "No Google API key was available, so a deterministic draft was used."
+        )
 
+    draft = _apply_cost_model(draft, inputs["location_type"])
     warnings = produce_constraint_warnings(
         draft,
         budget=inputs["budget"],
@@ -255,7 +385,12 @@ def create_production_plan(inputs: dict[str, Any]) -> dict[str, Any]:
         try:
             revised = asyncio.run(_run_adk(_gemini_prompt(inputs, draft, warnings)))
             draft = _normalise_plan(revised, draft)
-            adaptations.append("The plan was revised once against the time, budget, crew, and equipment warnings.")
+            draft = _apply_cost_model(draft, inputs["location_type"])
+            adaptations = list(draft.get("adaptations_made", adaptations))
+            generation_source = "gemini"
+            adaptations.append(
+                "The plan was revised once against the time, budget, crew, and equipment warnings."
+            )
             warnings = produce_constraint_warnings(
                 draft,
                 budget=inputs["budget"],
@@ -264,7 +399,9 @@ def create_production_plan(inputs: dict[str, Any]) -> dict[str, Any]:
                 available_equipment=inputs["equipment"],
             )
         except Exception:
-            adaptations.append("A revision pass was requested but the original validated draft was kept.")
+            adaptations.append(
+                "A revision pass was requested but the original validated draft was kept."
+            )
 
     total_minutes = calculate_total_shooting_time(draft["shot_list"])
     total_cost = calculate_total_cost(draft["shot_list"])
@@ -288,6 +425,7 @@ def create_production_plan(inputs: dict[str, Any]) -> dict[str, Any]:
 
     return {
         **draft,
+        "generation_source": generation_source,
         "shooting_schedule": schedule,
         "total_estimated_time": total_minutes,
         "total_estimated_cost": total_cost,

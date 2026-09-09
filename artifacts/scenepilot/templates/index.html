@@ -1,12 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#11191e">
-    <meta name="description" content="ScenePilot turns a scene brief into a practical shot list and shoot schedule.">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#11191e" />
+    <meta
+      name="description"
+      content="ScenePilot turns a scene brief into a practical shot list and shoot schedule."
+    />
     <title>ScenePilot — From intent to shoot day</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
     <div class="app-shell">
@@ -25,7 +28,10 @@
         <section class="intro" aria-labelledby="page-title">
           <p class="eyebrow">Scene to schedule / 01</p>
           <h1 id="page-title">Make the day <em>shootable.</em></h1>
-          <p class="intro-copy">Give ScenePilot the creative intent and the hard limits. It returns a practical shot plan your team can take to set.</p>
+          <p class="intro-copy">
+            Give ScenePilot the creative intent and the hard limits. It returns
+            a practical shot plan your team can take to set.
+          </p>
         </section>
 
         <div class="planner-grid">
@@ -37,18 +43,42 @@
               </div>
               <button class="text-action" id="sample-button" type="button">
                 Load sample scene
-                <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none">
-                  <path d="M2.5 7h8.25M7.5 3.75 10.75 7 7.5 10.25" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                >
+                  <path
+                    d="M2.5 7h8.25M7.5 3.75 10.75 7 7.5 10.25"
+                    stroke="currentColor"
+                    stroke-width="1.3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
                 </svg>
               </button>
             </div>
 
             <form id="plan-form" novalidate>
               <div class="field">
-                <label class="field-label" for="scene-description">Scene description <span class="required" aria-hidden="true">*</span></label>
-                <textarea id="scene-description" name="scene_description" required aria-describedby="scene-help scene-error" placeholder="What happens, where, and what must the camera feel?"></textarea>
+                <label class="field-label" for="scene-description"
+                  >Scene description
+                  <span class="required" aria-hidden="true">*</span></label
+                >
+                <textarea
+                  id="scene-description"
+                  name="scene_description"
+                  required
+                  aria-describedby="scene-help scene-error"
+                  placeholder="What happens, where, and what must the camera feel?"
+                ></textarea>
                 <div class="field-caption">
-                  <span id="scene-help">Include action, time of day, tone, and any non-negotiables.</span>
+                  <span id="scene-help"
+                    >Include action, time of day, tone, and any
+                    non-negotiables.</span
+                  >
                   <span id="char-count" aria-live="polite">0 / 2,000</span>
                 </div>
                 <p class="error-text" id="scene-error" role="alert"></p>
@@ -58,20 +88,35 @@
                 <div class="section-label">Day constraints</div>
                 <div class="constraint-grid">
                   <div class="field">
-                    <label class="field-label" for="budget">Budget ceiling</label>
+                    <label class="field-label" for="budget"
+                      >Budget ceiling</label
+                    >
                     <select id="budget" name="budget">
                       <option value="1500">$1,500 — lean unit</option>
-                      <option value="3000" selected>$3,000 — contained day</option>
+                      <option value="3000" selected>
+                        $3,000 — contained day
+                      </option>
                       <option value="6000">$6,000 — full day</option>
                       <option value="10000">$10,000 — expanded day</option>
                     </select>
                   </div>
                   <div class="field">
                     <label class="field-label" for="crew-size">Crew size</label>
-                    <input id="crew-size" name="crew_size" type="number" min="1" max="100" step="1" value="6" inputmode="numeric">
+                    <input
+                      id="crew-size"
+                      name="crew_size"
+                      type="number"
+                      min="1"
+                      max="100"
+                      step="1"
+                      value="6"
+                      inputmode="numeric"
+                    />
                   </div>
                   <div class="field">
-                    <label class="field-label" for="shooting-hours">Shooting hours</label>
+                    <label class="field-label" for="shooting-hours"
+                      >Shooting hours</label
+                    >
                     <select id="shooting-hours" name="shooting_hours">
                       <option value="4">4 hours</option>
                       <option value="6" selected>6 hours</option>
@@ -81,43 +126,125 @@
                     </select>
                   </div>
                   <div class="field">
-                    <label class="field-label" for="location-type">Location type</label>
+                    <label class="field-label" for="location-type"
+                      >Location type</label
+                    >
                     <select id="location-type" name="location_type">
-                       <option value="indoor">Indoor</option>
-                       <option value="outdoor">Outdoor</option>
-                       <option value="mixed">Mixed indoor / outdoor</option>
+                      <option value="indoor">Indoor</option>
+                      <option value="outdoor">Outdoor</option>
+                      <option value="mixed">Mixed indoor / outdoor</option>
                     </select>
                   </div>
                   <div class="field equipment-field">
-                    <label class="field-label" for="equipment">Available equipment</label>
-                    <input id="equipment" name="equipment" type="text" value="Cinema camera, tripod, LED kit, sound recorder" placeholder="List the kit already on hand">
-                    <div class="equipment-helper">Add a quick kit, or write your own.</div>
-                    <div class="equipment-chips" aria-label="Common equipment presets">
-                      <button class="equipment-chip" type="button" data-equipment="Cinema camera, tripod, LED kit, sound recorder">Lean cinema kit</button>
-                      <button class="equipment-chip" type="button" data-equipment="Mirrorless camera, handheld rig, LED panel, lav mic">Documentary kit</button>
-                      <button class="equipment-chip" type="button" data-equipment="Cinema camera, dolly, flags, HMI, boom">Full grip package</button>
+                    <label class="field-label" for="equipment"
+                      >Available equipment</label
+                    >
+                    <input
+                      id="equipment"
+                      name="equipment"
+                      type="text"
+                      value="Cinema camera, tripod, LED kit, sound recorder"
+                      placeholder="List the kit already on hand"
+                    />
+                    <div class="equipment-helper">
+                      Add a quick kit, or write your own.
+                    </div>
+                    <div
+                      class="equipment-chips"
+                      aria-label="Common equipment presets"
+                    >
+                      <button
+                        class="equipment-chip"
+                        type="button"
+                        data-equipment="Cinema camera, tripod, LED kit, sound recorder"
+                      >
+                        Lean cinema kit
+                      </button>
+                      <button
+                        class="equipment-chip"
+                        type="button"
+                        data-equipment="Mirrorless camera, handheld rig, LED panel, lav mic"
+                      >
+                        Documentary kit
+                      </button>
+                      <button
+                        class="equipment-chip"
+                        type="button"
+                        data-equipment="Cinema camera, dolly, flags, HMI, boom"
+                      >
+                        Full grip package
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div class="form-footer">
-                <p class="form-note">ScenePilot plans around your constraints. Review every recommendation with your production team.</p>
-                <button class="primary-button" id="generate-button" type="submit">
+                <p class="form-note">
+                  ScenePilot plans around your constraints. Review every
+                  recommendation with your production team.
+                </p>
+                <button
+                  class="primary-button"
+                  id="generate-button"
+                  type="submit"
+                >
                   <span class="button-label">Generate shoot plan</span>
                   <span class="button-spinner" aria-hidden="true"></span>
-                  <svg class="button-arrow" aria-hidden="true" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                    <path d="M2.5 7.5h9M8 3.5l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                  <svg
+                    class="button-arrow"
+                    aria-hidden="true"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 15 15"
+                    fill="none"
+                  >
+                    <path
+                      d="M2.5 7.5h9M8 3.5l4 4-4 4"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
                   </svg>
                 </button>
               </div>
             </form>
-            <div class="error-state" id="error-state" role="alert" aria-live="assertive">
-              <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 1.9 14.2 13H1.8L8 1.9Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
-                <path d="M8 5.2v3.4M8 10.7v.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <div
+              class="error-state"
+              id="error-state"
+              role="alert"
+              aria-live="assertive"
+            >
+              <svg
+                aria-hidden="true"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+                fill="none"
+              >
+                <path
+                  d="M8 1.9 14.2 13H1.8L8 1.9Z"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M8 5.2v3.4M8 10.7v.2"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
               </svg>
-              <span><strong>Plan unavailable.</strong> <span id="error-message">Check your connection and try again.</span> <button class="retry-button" id="retry-button" type="button">Retry</button></span>
+              <span
+                ><strong>Plan unavailable.</strong>
+                <span id="error-message"
+                  >Check your connection and try again.</span
+                >
+                <button class="retry-button" id="retry-button" type="button">
+                  Retry
+                </button></span
+              >
             </div>
           </section>
 
@@ -128,45 +255,102 @@
                   <p class="panel-kicker">Live workflow</p>
                   <h2 id="workflow-title">Plan status</h2>
                 </div>
-                <span class="workflow-status" id="workflow-status">Standing by</span>
+                <span class="workflow-status" id="workflow-status"
+                  >Standing by</span
+                >
               </div>
-              <p class="workflow-intro" id="workflow-intro">Your plan will move through four practical checks.</p>
+              <p class="workflow-intro" id="workflow-intro">
+                Your plan will move through four practical checks.
+              </p>
             </div>
             <ol class="stages" id="stages">
               <li class="stage" data-stage="0">
                 <span class="stage-marker">01</span>
-                <span class="stage-content"><span class="stage-name">Analysing Scene</span><span class="stage-detail">Reading intent and action</span></span>
+                <span class="stage-content"
+                  ><span class="stage-name">Analysing Scene</span
+                  ><span class="stage-detail"
+                    >Reading intent and action</span
+                  ></span
+                >
               </li>
               <li class="stage" data-stage="1">
                 <span class="stage-marker">02</span>
-                <span class="stage-content"><span class="stage-name">Creating Shot Plan</span><span class="stage-detail">Turning beats into coverage</span></span>
+                <span class="stage-content"
+                  ><span class="stage-name">Creating Shot Plan</span
+                  ><span class="stage-detail"
+                    >Turning beats into coverage</span
+                  ></span
+                >
               </li>
               <li class="stage" data-stage="2">
                 <span class="stage-marker">03</span>
-                <span class="stage-content"><span class="stage-name">Checking Constraints</span><span class="stage-detail">Testing time, crew, and kit</span></span>
+                <span class="stage-content"
+                  ><span class="stage-name">Checking Constraints</span
+                  ><span class="stage-detail"
+                    >Testing time, crew, and kit</span
+                  ></span
+                >
               </li>
               <li class="stage" data-stage="3">
                 <span class="stage-marker">04</span>
-                <span class="stage-content"><span class="stage-name">Revising Plan</span><span class="stage-detail">Making the day workable</span></span>
+                <span class="stage-content"
+                  ><span class="stage-name">Revising Plan</span
+                  ><span class="stage-detail"
+                    >Making the day workable</span
+                  ></span
+                >
               </li>
             </ol>
             <div class="workflow-foot">
-              <svg aria-hidden="true" width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <path d="M7.5 1.7v11.6M1.7 7.5h11.6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              <svg
+                aria-hidden="true"
+                width="15"
+                height="15"
+                viewBox="0 0 15 15"
+                fill="none"
+              >
+                <path
+                  d="M7.5 1.7v11.6M1.7 7.5h11.6"
+                  stroke="currentColor"
+                  stroke-width="1.2"
+                  stroke-linecap="round"
+                />
               </svg>
               <span>One clear plan, built around the limits you gave us.</span>
             </div>
-            <div class="empty-plan" id="initial-empty"><strong>No plan yet</strong><p>Your first pass will appear below once you generate a shoot plan.</p></div>
+            <div class="empty-plan" id="initial-empty">
+              <strong>No plan yet</strong>
+              <p>
+                Your first pass will appear below once you generate a shoot
+                plan.
+              </p>
+            </div>
           </aside>
         </div>
 
-        <section class="results" id="results" aria-labelledby="results-title" hidden>
+        <section
+          class="results"
+          id="results"
+          aria-labelledby="results-title"
+          hidden
+        >
           <div class="results-header">
             <div>
               <p class="eyebrow">Production plan / 02</p>
               <h2 id="results-title">Your day on paper</h2>
             </div>
-            <p class="result-meta" id="result-meta">Generated from your scene brief</p>
+            <div>
+              <p class="result-meta" id="result-meta">
+                Generated from your scene brief
+              </p>
+              <button
+                type="button"
+                class="primary-button print-button"
+                onclick="window.print()"
+              >
+                Print / Save PDF
+              </button>
+            </div>
           </div>
 
           <div class="summary-grid">
@@ -189,6 +373,18 @@
               <span class="constraint-ok" id="constraint-status">—</span>
             </article>
           </div>
+
+          <article
+            class="result-card cost-card"
+            id="cost-breakdown-card"
+            hidden
+          >
+            <div class="card-heading">
+              <h3>Cost breakdown</h3>
+              <span>Illustrative estimate</span>
+            </div>
+            <div class="cost-grid" id="cost-breakdown-grid"></div>
+          </article>
 
           <div class="breakdown-grid" id="breakdown-grid"></div>
 
@@ -213,7 +409,13 @@
                   <tbody id="shot-table-body"></tbody>
                 </table>
               </div>
-              <div class="empty-plan" id="shot-empty" hidden><strong>No shots returned</strong><p>The plan came back without shot coverage. Try adding more action or visual detail to the brief.</p></div>
+              <div class="empty-plan" id="shot-empty" hidden>
+                <strong>No shots returned</strong>
+                <p>
+                  The plan came back without shot coverage. Try adding more
+                  action or visual detail to the brief.
+                </p>
+              </div>
             </article>
 
             <article class="result-card schedule-card">
@@ -222,7 +424,10 @@
                 <span>ORDER OF DAY</span>
               </div>
               <ol class="schedule-list" id="schedule-list"></ol>
-              <div class="empty-plan" id="schedule-empty" hidden><strong>No schedule returned</strong><p>There is no timing data attached to this plan.</p></div>
+              <div class="empty-plan" id="schedule-empty" hidden>
+                <strong>No schedule returned</strong>
+                <p>There is no timing data attached to this plan.</p>
+              </div>
             </article>
           </div>
 
@@ -230,19 +435,25 @@
             <article class="result-card note-card">
               <h3>Warnings</h3>
               <ul class="note-list" id="warnings-list"></ul>
-              <p class="detail-empty" id="warnings-empty" hidden>No production warnings returned.</p>
+              <p class="detail-empty" id="warnings-empty" hidden>
+                No production warnings returned.
+              </p>
             </article>
             <article class="result-card note-card">
               <h3>Adaptations made</h3>
               <ul class="note-list" id="adaptations-list"></ul>
-              <p class="detail-empty" id="adaptations-empty" hidden>No adaptations were needed.</p>
+              <p class="detail-empty" id="adaptations-empty" hidden>
+                No adaptations were needed.
+              </p>
             </article>
           </div>
         </section>
       </main>
 
-      <footer class="footer">SCENEPILOT / A practical first pass for the next shoot day</footer>
+      <footer class="footer">
+        SCENEPILOT / A practical first pass for the next shoot day
+      </footer>
     </div>
-     <script src="/static/app.js"></script>
+    <script src="/static/app.js"></script>
   </body>
 </html>

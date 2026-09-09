@@ -68,7 +68,7 @@ def healthz():
     return jsonify({"status": "ok", "service": "scenepilot"})
 
 
-@app.post("/api/plan")
+@app.post("/generate-plan")
 def plan():
     if not request.is_json:
         return jsonify({"error": "Send the planning inputs as JSON."}), 400

@@ -25,4 +25,11 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-GOOGLE_GENAI_USE_ENTERPRISE = "true"
+GOOGLE_GENAI_USE_ENTERPRISE = "TRUE"
+
+[[ports]]
+localPort = 5000
+
+[[ports]]
+localPort = 20941
+externalPort = 80

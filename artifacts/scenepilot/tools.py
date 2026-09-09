@@ -1,6 +1,7 @@
 """Deterministic planning tools used by ScenePilot's agent workflow."""
 
 from __future__ import annotations
+import re
 
 from collections.abc import Iterable
 from typing import Any
@@ -9,7 +10,7 @@ from typing import Any
 def _equipment_tokens(items: Iterable[str] | str) -> list[str]:
     if isinstance(items, str):
         items = items.split(",")
-    return [item.strip().lower() for item in items if item and item.strip()]
+    return [re.sub(r"^\d+(?:\s*x\s*|\s+)", "", item.strip().lower().replace("–", "-").replace("—", "-")) for item in items if item and item.strip()]
 
 
 def calculate_total_shooting_time(shot_list: list[dict[str, Any]]) -> int:
